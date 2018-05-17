@@ -1,3 +1,4 @@
+// @flow
 import deepEqual from "fast-deep-equal";
 
 export const NOPComponent = () => null;

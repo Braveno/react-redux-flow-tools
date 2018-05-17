@@ -1,10 +1,7 @@
 [ignore]
-.*/node_modules/.*
-.*/flow-typed/.*
-.*/lib/.*
+<PROJECT_ROOT>/lib/.*
 
 [include]
-node_modules/flow-interfaces/interfaces
 
 [libs]
 
@@ -12,7 +9,6 @@ node_modules/flow-interfaces/interfaces
 all=error
 
 [options]
-all=true
 esproposal.class_instance_fields=enable
 esproposal.class_static_fields=enable
 
