@@ -10,9 +10,6 @@
       2,
       "never"
     ],
-    "react/jsx-uses-react": 2,
-    "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 2,
     "linebreak-style": [
       "error",
       "unix"
@@ -30,14 +27,15 @@
     "no-dupe-class-members": "error",
     "no-dupe-keys": "error",
     "camelcase": "error",
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "flowtype/no-types-missing-file-annotation": "off"
   },
   "plugins": [
-    "react",
+    "flowtype",
     "prettier"
   ],
   "extends": [
     "eslint:recommended",
-    "react-app"
+    "plugin:flowtype/recommended"
   ]
 }
