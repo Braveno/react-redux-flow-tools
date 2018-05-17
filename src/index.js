@@ -93,10 +93,6 @@ const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
     return obj;
   }
 
-  // TODO is necessary @Christian? If yes platform specific files needed
-  // if (typeof window !== 'undefined' && (obj === window || obj === document)) {
-  //   throw new Error('ValueError: can\'t freeze protected variables');
-  // }
   // Retrieve the property names defined on obj
   const propNames = Object.getOwnPropertyNames(obj);
 
@@ -114,7 +110,8 @@ const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
   return Object.freeze(obj);
 };
 
-export const deepFreeze = _deepFreeze; // process.env.NODE_ENV === 'production' ? ident : _deepFreeze;
+export const deepFreeze =
+  process.env.NODE_ENV === "production" ? ident : _deepFreeze;
 
 export const not = (fun: (...args: $ReadOnlyArray<*>) => boolean) => (
   ...args: $ReadOnlyArray<*>

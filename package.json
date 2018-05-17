@@ -4,6 +4,7 @@
   "description": "Assortment of tools useful in combining React/Redux/Flow and functional programming in general",
   "main": "lib/index.js",
   "scripts": {
+    "fix": "eslint --fix src/",
     "eslint": "esw src/",
     "eslint:watch": "esw -w src/",
     "flow": "flow",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.1",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "eslint": "^4.9.0",
     "eslint-plugin-flowtype": "^2.46.3",
