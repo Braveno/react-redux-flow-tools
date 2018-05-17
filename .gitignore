@@ -1,0 +1,9 @@
+**/node_modules/*
+npm-debug.log
+**/.idea/*
+.*.swp
+nohup.out
+\#*
+.vagrant
+**/.vscode
+**/*.env

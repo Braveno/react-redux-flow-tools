@@ -1,0 +1,3 @@
+# parser: flow
+trailingComma: all
+arrowParens: always
