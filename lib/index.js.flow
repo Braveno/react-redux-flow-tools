@@ -1,0 +1,33 @@
+// @flow
+
+import deepEqual from "fast-deep-equal";
+declare export function NOPComponent(): null;
+export type PropsCompareType<T: {}> = (_: T, _: T) => boolean;
+
+declare export function _updateIn(upsert: boolean): <T: {}>(target: T, ...sources: Array<any>) => mixed /* UNEXPECTED TYPE: EvalT */;
+declare export function assign<T: {}>(target: T, ...sources: $ReadOnlyArray<any>): mixed /* UNEXPECTED TYPE: EvalT */;
+
+declare export function compareProps<T: {}>(...deep: Array<$Keys<T>>): (_: T, _: T) => boolean;
+
+declare export var deepFreeze: <T>(x: T) => T | <T: {}>(obj: T) => mixed /* UNEXPECTED TYPE: EvalT */;
+declare export function flatMap<T, S>(arr: $ReadOnlyArray<T>, f: (_: T) => $ReadOnlyArray<S>): Array<mixed /* UNEXPECTED TYPE: EmptyT */ | mixed /* UNEXPECTED TYPE: EmptyT */ | mixed /* UNEXPECTED TYPE: EmptyT */ | any | mixed | mixed | mixed | any | mixed | mixed | mixed | any>;
+
+declare export function ident<T>(x: T): T;
+
+declare export function isDefined(value?: mixed): boolean;
+declare export function isNumber(number: any): boolean;
+declare export function isObject(obj?: mixed /* UNEXPECTED TYPE: EmptyT */): boolean;
+declare export function just<T>(value?: ?T): T;
+
+declare export function matchExpected<T>(value: mixed /* UNEXPECTED TYPE: ExistsT */): T;
+
+declare export function noop(): void;
+declare export function not(fun: (...args: $ReadOnlyArray<any>) => boolean): (...args: $ReadOnlyArray<any>) => boolean;
+declare export function updateIn<T: {}>(target: T, ...sources: Array<any>): mixed /* UNEXPECTED TYPE: EvalT */;
+
+declare export function upsertIn<T: {}>(target: T, ...sources: Array<any>): mixed /* UNEXPECTED TYPE: EvalT */;
+
+declare export function valueToString<T>(value: T): string;
+
+declare export function withDefault<T>(value?: T, d: T): T;
+

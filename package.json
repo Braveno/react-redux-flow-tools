@@ -9,10 +9,11 @@
     "eslint:watch": "esw -w src/",
     "flow": "flow",
     "flow:watch": "flow-watch",
+    "flow:generate": "flow gen-flow-files --out-dir lib/ src/",
     "flow-typed": "flow-typed update",
     "start": "npm-run-all -p eslint:watch",
     "babel": "babel src -d lib",
-    "build": "npm-run-all flow-typed eslint flow babel"
+    "build": "npm-run-all flow-typed eslint flow:generate babel"
   },
   "repository": {
     "type": "git",
