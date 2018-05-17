@@ -1,0 +1,25 @@
+{
+  "name": "react-redux-flow-tools",
+  "version": "0.0.9",
+  "description": "Assortment of tools useful in combining React/Redux/Flow and functional programming in general",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chjdev/react-redux-flow-tools.git"
+  },
+  "keywords": [
+    "react",
+    "redux",
+    "flow",
+    "functional"
+  ],
+  "author": "Christian Junker",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/chjdev/react-redux-flow-tools/issues"
+  },
+  "homepage": "https://github.com/chjdev/react-redux-flow-tools#readme"
+}
