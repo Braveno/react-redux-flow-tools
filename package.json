@@ -4,8 +4,8 @@
   "description": "Assortment of tools useful in combining React/Redux/Flow and functional programming in general",
   "main": "lib/index.js",
   "scripts": {
-    "fix": "eslint --fix src/",
     "eslint": "esw src/",
+    "eslint:fix": "eslint --fix src/",
     "eslint:watch": "esw -w src/",
     "flow": "flow",
     "flow:watch": "flow-watch",

@@ -1,5 +1,9 @@
 // @flow
+
 import deepEqual from "fast-deep-equal";
+
+export * from "./actions";
+export * from "./reducers";
 
 export const NOPComponent = () => null;
 
@@ -14,6 +18,29 @@ export const ident = <T>(x: T): T => x;
 export const isDefined = (value: ?mixed): boolean => value != null;
 export const isObject = (obj: ?mixed): boolean =>
   isDefined(obj) && typeof obj === "object";
+export const isEmpty = (obj?: {} | Array<mixed>): boolean => {
+  //courtesy of https://stackoverflow.com/questions/4994201/is-object-empty
+  // null and undefined are "empty"
+  if (obj == null) {
+    return true;
+  }
+
+  // If it isn't an object at this point
+  // it is empty, but it can't be anything *but* empty
+  // Is it empty?  Depends on your application.
+  if (typeof obj !== "object") {
+    return true;
+  }
+
+  // Assume if it has a length property with a non-zero value
+  // that that property is correct.
+  if (obj instanceof Array) {
+    return obj.length === 0;
+  } else {
+    // Otherwise, does it have any properties of its own?
+    return Object.getOwnPropertyNames(obj).length > 0;
+  }
+};
 export const isNumber = (number: mixed): boolean => {
   if (number != null && number !== "") {
     const coerced = Number(number);
@@ -24,6 +51,24 @@ export const isNumber = (number: mixed): boolean => {
 };
 export const withDefault = <T>(value?: T, d: T): T =>
   value !== undefined && value !== null ? (value: T) : d;
+
+export const maybePath = (
+  obj: {},
+  ...path: $ReadOnlyArray<string | number>
+): mixed | typeof undefined => {
+  if (obj == null || path.length === 0) {
+    return undefined;
+  }
+  const key = path[0];
+  const rest = path.slice(1);
+  if (obj instanceof Object && obj.hasOwnProperty(key)) {
+    if (rest.length === 0) {
+      return obj[key];
+    } else {
+      return maybePath(obj[key], ...rest);
+    }
+  }
+};
 
 export const just = <T>(value: ?T): T => {
   if (value != null) {
@@ -77,9 +122,11 @@ export const not = (fun: (...args: $ReadOnlyArray<mixed>) => boolean) => (
   ...args: $ReadOnlyArray<mixed>
 ): boolean => !fun(...args);
 
+export type PropsCompareType<T: {}> = (T, T) => boolean;
+
 export const compareProps = <T: {}>(
   ...deep: $Keys<T>[]
-): ((T, T) => boolean) => (props: T, nextProps: T): boolean => {
+): PropsCompareType<T> => (props: T, nextProps: T): boolean => {
   if (deep.length === 0) {
     return props === nextProps;
   }
@@ -98,7 +145,82 @@ export const compareProps = <T: {}>(
   }
 };
 
-export type PropsCompareType<T: {}> = (T, T) => boolean;
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+export const escapeRegExp = (string: string) =>
+  string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 
-export * from "./actions";
-export * from "./reducers";
+export const filterRegexBy = <T>(
+  filter: string,
+  lens?: (T) => string = JSON.stringify,
+): ((T) => boolean) => {
+  // const cleanFilter = filter.replace(/\s+/, '');
+  const cleanFilter = filter.trim();
+  if (cleanFilter === "") {
+    return () => true;
+  }
+  const regex = new RegExp(
+    `.*${cleanFilter
+      .split("")
+      .map(escapeRegExp)
+      .join(".*")}.*`,
+    "i",
+  );
+  return (element) => regex.test(lens(element));
+};
+
+/**
+ * perform a naive check to see wether the array should be sorted based on a few indices
+ * @param comparator comparator function for the array
+ * @param array the array to be sorted
+ * @return the sorted (if necessary) array
+ */
+// Note: flow has a hiccup on a curried version so needs to be curried by consumer
+export const testSort = <T>(
+  comparator: (T, T) => number,
+  array: $ReadOnlyArray<T>,
+): $ReadOnlyArray<T> => {
+  if (array.length < 2) {
+    return array;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    // check full array during development
+    const isSorted = array.every((value, index, array) => {
+      return index === 0 || comparator(array[index - 1], value) <= 0;
+    });
+    if (!isSorted) {
+      console.warn(
+        `Provided array is unsorted according to ${comparator.name}`,
+      );
+      // todo adapt deepFreeze for arrays as well
+      return array.slice(0).sort(comparator);
+    } else {
+      return array;
+    }
+  } else {
+    // perform optimistic check of subset of the array
+    const lastIdx = array.length - 1;
+    const testIdxs = [
+      Math.round(lastIdx / 3),
+      Math.round(lastIdx * 0.6666667),
+      lastIdx,
+    ];
+    let previousElement = array[0];
+    for (const testIdx of testIdxs) {
+      const compareValue = comparator(previousElement, array[testIdx]);
+      if (compareValue > 0) {
+        console.warn(
+          `Provided array is unsorted sorted according to ${comparator.name}!
+          ${valueToString(array[testIdx])}
+          is smaller than
+          ${valueToString(previousElement)}`,
+        );
+        // todo adapt deepFreeze for arrays as well
+        return array.slice(0).sort(comparator);
+      }
+      previousElement = array[testIdx];
+    }
+    return array;
+  }
+};
+
