@@ -21,7 +21,7 @@
       }
     ],
     "curly": "error",
-    "eqeqeq": "error",
+    "eqeqeq": ["error", "always", {"null": "ignore"}],
     "no-console": "off",
     "no-dupe-args": "error",
     "no-dupe-class-members": "error",

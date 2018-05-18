@@ -6,28 +6,31 @@ export const NOPComponent = () => null;
 export const noop = () => {};
 
 export const ident = <T>(x: T): T => x;
-export const isDefined = (value?: *): boolean =>
-  value !== undefined && value !== null;
-export const isObject = (obj?: *): boolean =>
+export const isDefined = (value: ?mixed): boolean => value != null;
+export const isObject = (obj: ?mixed): boolean =>
   isDefined(obj) && typeof obj === "object";
-export const isNumber = (number: *): boolean =>
-  !isNaN(Number(number)) && isFinite(number);
+export const isNumber = (number: mixed): boolean => {
+  if (number != null && number !== "") {
+    const coerced = Number(number);
+    return !isNaN(coerced) && isFinite(coerced);
+  } else {
+    return false;
+  }
+};
 export const withDefault = <T>(value?: T, d: T): T =>
   value !== undefined && value !== null ? (value: T) : d;
 
-export const matchExpected = <T>(value: *): T => value;
-export const just = <T>(value?: ?T): T => {
-  if (isDefined(value)) {
-    return matchExpected(value);
+export const just = <T>(value: ?T): T => {
+  if (value != null) {
+    return (value: T);
   } else {
     throw new Error("ValueError: provided value is undefined and not `just`");
   }
 };
 
-/** @todo $Supertype should be $Shape but proposal unclear atm */
 export const assign = <T: {}>(
   target: T,
-  ...sources: $ReadOnlyArray<$Supertype<T>>
+  ...sources: $ReadOnlyArray<$Shape<T>>
 ): $ReadOnly<T> => deepFreeze(Object.assign({}, target, ...sources));
 
 /** @todo replace with https://tc39.github.io/proposal-flatMap/ 2018 */
@@ -36,10 +39,9 @@ export const flatMap = <T, S>(
   f: (T) => $ReadOnlyArray<S>,
 ) => arr.reduce((x, y) => [...x, ...f(y)], []);
 
-/** @todo Supertype should be Shape. currently allows for spurious members but needs more thought */
 export const _updateIn = (upsert: boolean) => <T: {}>(
   target: T,
-  ...sources: $Supertype<T>[]
+  ...sources: $Shape<T>[]
 ): $ReadOnly<T> =>
   assign(
     target,
@@ -49,7 +51,6 @@ export const _updateIn = (upsert: boolean) => <T: {}>(
           target === undefined ||
           (target !== null && !target.hasOwnProperty(k))
         ) {
-          // check necessary because of $Supertype / $Shape uncertainty
           if (upsert) {
             return Object.freeze({ [k]: source[k] });
           } else {
@@ -81,8 +82,6 @@ export const upsertIn = _updateIn(true);
 export const valueToString = <T>(value: T): string => {
   if (value === undefined) {
     return "undefined";
-  } else if (value === null) {
-    return "null";
   } else {
     return JSON.stringify(value);
   }
@@ -114,8 +113,8 @@ const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
 export const deepFreeze =
   process.env.NODE_ENV === "production" ? ident : _deepFreeze;
 
-export const not = (fun: (...args: $ReadOnlyArray<*>) => boolean) => (
-  ...args: $ReadOnlyArray<*>
+export const not = (fun: (...args: $ReadOnlyArray<mixed>) => boolean) => (
+  ...args: $ReadOnlyArray<mixed>
 ): boolean => !fun(...args);
 
 export const compareProps = <T: {}>(
@@ -124,11 +123,9 @@ export const compareProps = <T: {}>(
   if (deep.length === 0) {
     return props === nextProps;
   }
-  const namesProps = Object.getOwnPropertyNames(props);
-  const namesNextProps = Object.getOwnPropertyNames(nextProps);
-  if (!deepEqual(namesProps, namesNextProps)) {
-    return false;
-  } else {
+  const namesProps = Object.getOwnPropertyNames(props).sort();
+  const namesNextProps = Object.getOwnPropertyNames(nextProps).sort();
+  if (deepEqual(namesProps, namesNextProps)) {
     return namesProps.every((k) => {
       if (deep.includes(k)) {
         return deepEqual(props[k], nextProps[k]);
@@ -136,6 +133,8 @@ export const compareProps = <T: {}>(
         return props[k] === nextProps[k];
       }
     });
+  } else {
+    return false;
   }
 };
 
