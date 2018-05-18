@@ -13,7 +13,8 @@
     "flow-typed": "flow-typed update",
     "start": "npm-run-all -p eslint:watch",
     "babel": "babel src -d lib",
-    "build": "npm-run-all flow-typed eslint flow:generate babel"
+    "build": "npm-run-all flow-typed eslint flow:generate babel",
+    "build:fast": "npm-run-all flow:generate babel"
   },
   "repository": {
     "type": "git",
