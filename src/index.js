@@ -3,6 +3,11 @@ import deepEqual from "fast-deep-equal";
 
 export const NOPComponent = () => null;
 
+export type JSONField = number | string;
+export type JSONType = {
+  +[string]: $ReadOnlyArray<JSONField | JSONType> | JSONField,
+};
+
 export const noop = () => {};
 
 export const ident = <T>(x: T): T => x;
@@ -28,56 +33,11 @@ export const just = <T>(value: ?T): T => {
   }
 };
 
-export const assign = <T: {}>(
-  target: T,
-  ...sources: $ReadOnlyArray<$Shape<T>>
-): $ReadOnly<T> => deepFreeze(Object.assign({}, target, ...sources));
-
 /** @todo replace with https://tc39.github.io/proposal-flatMap/ 2018 */
 export const flatMap = <T, S>(
   arr: $ReadOnlyArray<T>,
   f: (T) => $ReadOnlyArray<S>,
 ) => arr.reduce((x, y) => [...x, ...f(y)], []);
-
-export const _updateIn = (upsert: boolean) => <T: {}>(
-  target: T,
-  ...sources: $Shape<T>[]
-): $ReadOnly<T> =>
-  assign(
-    target,
-    ...flatMap(sources, (source) =>
-      Object.keys(source).map((k) => {
-        if (
-          target === undefined ||
-          (target !== null && !target.hasOwnProperty(k))
-        ) {
-          if (upsert) {
-            return Object.freeze({ [k]: source[k] });
-          } else {
-            throw new Error(
-              `TypeError: Object ${valueToString(
-                target,
-              )} has no key ${k} and upsert is ${upsert.toString()}`,
-            );
-          }
-        } else if (
-          isObject(source[k]) &&
-          !(source[k] instanceof Array) &&
-          source[k].constructor.name === "Object"
-        ) {
-          return Object.freeze({
-            [k]: assign(target[k], _updateIn(upsert)(target[k], source[k])),
-          });
-        } else {
-          return Object.freeze({ [k]: source[k] });
-        }
-      }),
-    ),
-  );
-
-export const updateIn = _updateIn(false);
-
-export const upsertIn = _updateIn(true);
 
 export const valueToString = <T>(value: T): string => {
   if (value === undefined) {
@@ -139,3 +99,6 @@ export const compareProps = <T: {}>(
 };
 
 export type PropsCompareType<T: {}> = (T, T) => boolean;
+
+export * from "./actions";
+export * from "./reducers";

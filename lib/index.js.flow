@@ -1,31 +1,104 @@
 // @flow
-
 import deepEqual from "fast-deep-equal";
-declare export function NOPComponent(): null;
-export type PropsCompareType<T: {}> = (_: T, _: T) => boolean;
 
-declare export function _updateIn(upsert: boolean): <T: {}>(target: T, ...sources: Array<$Shape<T>>) => mixed /* UNEXPECTED TYPE: EvalT */;
-declare export function assign<T: {}>(target: T, ...sources: $ReadOnlyArray<$Shape<T>>): mixed /* UNEXPECTED TYPE: EvalT */;
+export const NOPComponent = () => null;
 
-declare export function compareProps<T: {}>(...deep: Array<$Keys<T>>): (_: T, _: T) => boolean;
+export type JSONField = number | string;
+export type JSONType = {
+  +[string]: $ReadOnlyArray<JSONField | JSONType> | JSONField,
+};
 
-declare export var deepFreeze: <T>(x: T) => T | <T: {}>(obj: T) => mixed /* UNEXPECTED TYPE: EvalT */;
-declare export function flatMap<T, S>(arr: $ReadOnlyArray<T>, f: (_: T) => $ReadOnlyArray<S>): Array<mixed /* UNEXPECTED TYPE: EmptyT */ | any | mixed | any | mixed | any>;
+export const noop = () => {};
 
-declare export function ident<T>(x: T): T;
+export const ident = <T>(x: T): T => x;
+export const isDefined = (value: ?mixed): boolean => value != null;
+export const isObject = (obj: ?mixed): boolean =>
+  isDefined(obj) && typeof obj === "object";
+export const isNumber = (number: mixed): boolean => {
+  if (number != null && number !== "") {
+    const coerced = Number(number);
+    return !isNaN(coerced) && isFinite(coerced);
+  } else {
+    return false;
+  }
+};
+export const withDefault = <T>(value?: T, d: T): T =>
+  value !== undefined && value !== null ? (value: T) : d;
 
-declare export function isDefined(value: ?mixed): boolean;
-declare export function isNumber(number: mixed): boolean;
-declare export function isObject(obj: ?mixed): boolean;
-declare export function just<T>(value: ?T): T;
+export const just = <T>(value: ?T): T => {
+  if (value != null) {
+    return (value: T);
+  } else {
+    throw new Error("ValueError: provided value is undefined and not `just`");
+  }
+};
 
-declare export function noop(): void;
-declare export function not(fun: (...args: $ReadOnlyArray<mixed>) => boolean): (...args: $ReadOnlyArray<mixed>) => boolean;
-declare export function updateIn<T: {}>(target: T, ...sources: Array<$Shape<T>>): mixed /* UNEXPECTED TYPE: EvalT */;
+/** @todo replace with https://tc39.github.io/proposal-flatMap/ 2018 */
+export const flatMap = <T, S>(
+  arr: $ReadOnlyArray<T>,
+  f: (T) => $ReadOnlyArray<S>,
+) => arr.reduce((x, y) => [...x, ...f(y)], []);
 
-declare export function upsertIn<T: {}>(target: T, ...sources: Array<$Shape<T>>): mixed /* UNEXPECTED TYPE: EvalT */;
+export const valueToString = <T>(value: T): string => {
+  if (value === undefined) {
+    return "undefined";
+  } else {
+    return JSON.stringify(value);
+  }
+};
 
-declare export function valueToString<T>(value: T): string;
+// courtesy of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
+  if (!isDefined(obj) || Object.isFrozen(obj)) {
+    return obj;
+  }
 
-declare export function withDefault<T>(value?: T, d: T): T;
+  // Retrieve the property names defined on obj
+  const propNames = Object.getOwnPropertyNames(obj);
 
+  // Freeze properties before freezing self
+  propNames.forEach((name) => {
+    const prop = obj[name];
+
+    if (prop instanceof Array) {
+      obj[name] = Object.freeze(prop.map(deepFreeze));
+    } else if (isDefined(prop) && typeof prop === "object") {
+      obj[name] = _deepFreeze(prop);
+    }
+  });
+  // Freeze self (no-op if already frozen)
+  return Object.freeze(obj);
+};
+
+export const deepFreeze =
+  process.env.NODE_ENV === "production" ? ident : _deepFreeze;
+
+export const not = (fun: (...args: $ReadOnlyArray<mixed>) => boolean) => (
+  ...args: $ReadOnlyArray<mixed>
+): boolean => !fun(...args);
+
+export const compareProps = <T: {}>(
+  ...deep: $Keys<T>[]
+): ((T, T) => boolean) => (props: T, nextProps: T): boolean => {
+  if (deep.length === 0) {
+    return props === nextProps;
+  }
+  const namesProps = Object.getOwnPropertyNames(props).sort();
+  const namesNextProps = Object.getOwnPropertyNames(nextProps).sort();
+  if (deepEqual(namesProps, namesNextProps)) {
+    return namesProps.every((k) => {
+      if (deep.includes(k)) {
+        return deepEqual(props[k], nextProps[k]);
+      } else {
+        return props[k] === nextProps[k];
+      }
+    });
+  } else {
+    return false;
+  }
+};
+
+export type PropsCompareType<T: {}> = (T, T) => boolean;
+
+export * from "./actions";
+export * from "./reducers";
