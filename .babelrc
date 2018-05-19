@@ -1,3 +1,5 @@
 {
-  "presets": ["flow", "env"]
+  "presets": ["flow", "env"],
+  "comments": false,
+  "minified": true
 }

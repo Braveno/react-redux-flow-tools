@@ -11,8 +11,9 @@
     "flow:watch": "flow-watch",
     "flow:generate": "flow-copy-source -v src/ lib/",
     "flow-typed": "flow-typed update",
-    "start": "npm-run-all -p flow:watch eslint:watch",
+    "start": "npm-run-all -p flow:watch eslint:watch babel:watch",
     "babel": "babel src -d lib",
+    "babel:watch": "babel -w src -d lib",
     "build": "npm-run-all flow-typed eslint flow:generate babel",
     "build:fast": "npm-run-all flow:generate babel"
   },
