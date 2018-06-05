@@ -7,9 +7,7 @@ export type ActionHandlersType<S> = {| [string]: ActionHandlerType<S> |};
 
 export const actionHandler = <S, A>(
   action: ActionCreatorType<A>,
-  handler: ActionHandlerType<S, A>
+  handler: ActionHandlerType<S, A>,
 ): ActionHandlersType<S> => ({
   [action.toString()]: handler,
 });
-
-
