@@ -116,7 +116,7 @@ const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
 };
 
 export const deepFreeze =
-  process.env.NODE_ENV === "production" ? ident : _deepFreeze;
+  process.env.NODE_ENV !== "development" ? ident : _deepFreeze;
 
 export const not = (fun: (...args: $ReadOnlyArray<mixed>) => boolean) => (
   ...args: $ReadOnlyArray<mixed>
