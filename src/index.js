@@ -223,3 +223,13 @@ export const testSort = <T>(
     return array;
   }
 };
+
+export const assert = (condition: boolean, message: string): void => {
+  if (!condition) {
+    message = message || "Assertion failed";
+    if (typeof Error !== "undefined") {
+      throw new Error("AssertionError: " + message);
+    }
+    throw message; // Fallback
+  }
+};
