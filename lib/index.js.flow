@@ -105,7 +105,7 @@ export const valueToString = <T>(value: T): string => {
 
 // courtesy of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
 const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
-  if (!isDefined(obj) || typeof Object.isFrozen === "undefined" || Object.isFrozen(obj)) {
+  if (!isDefined(obj) || !isObject(obj) || typeof Object.isFrozen === "undefined" || Object.isFrozen(obj)) {
     return obj;
   }
 
