@@ -70,11 +70,22 @@ export const maybePath = (
   }
 };
 
+export const assert = (condition: boolean, message: string): void => {
+  if (!condition) {
+    message = message || "Assertion failed";
+    if (typeof Error !== "undefined") {
+      throw new Error("AssertionError: " + message);
+    }
+    throw message; // Fallback
+  }
+};
+
 export const just = <T>(value: ?T): T => {
   if (value != null) {
     return (value: T);
   } else {
-    throw new Error("ValueError: provided value is undefined and not `just`");
+    // clunky because of flow
+    assert(false, "provided value is undefined and not `just`");
   }
 };
 
@@ -94,7 +105,7 @@ export const valueToString = <T>(value: T): string => {
 
 // courtesy of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
 const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
-  if (!isDefined(obj) || Object.isFrozen(obj)) {
+  if (!isDefined(obj) || typeof Object.isFrozen === "undefined" || Object.isFrozen(obj)) {
     return obj;
   }
 
@@ -224,12 +235,4 @@ export const testSort = <T>(
   }
 };
 
-export const assert = (condition: boolean, message: string): void => {
-  if (!condition) {
-    message = message || "Assertion failed";
-    if (typeof Error !== "undefined") {
-      throw new Error("AssertionError: " + message);
-    }
-    throw message; // Fallback
-  }
-};
+
