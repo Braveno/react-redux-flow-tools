@@ -84,8 +84,7 @@ export const just = <T>(value: ?T): T => {
   if (value != null) {
     return (value: T);
   } else {
-    // clunky because of flow
-    assert(false, "provided value is undefined and not `just`");
+    throw new Error("ValueError: provided value is undefined and not `just`");
   }
 };
 
@@ -105,7 +104,12 @@ export const valueToString = <T>(value: T): string => {
 
 // courtesy of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
 const _deepFreeze = <T: {}>(obj: T): $ReadOnly<T> => {
-  if (!isDefined(obj) || !isObject(obj) || typeof Object.isFrozen === "undefined" || Object.isFrozen(obj)) {
+  if (
+    !isDefined(obj) ||
+    !isObject(obj) ||
+    typeof Object.isFrozen === "undefined" ||
+    Object.isFrozen(obj)
+  ) {
     return obj;
   }
 
@@ -234,5 +238,3 @@ export const testSort = <T>(
     return array;
   }
 };
-
-
